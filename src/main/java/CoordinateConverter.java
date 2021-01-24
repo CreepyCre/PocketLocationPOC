@@ -1,5 +1,4 @@
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Vector;
 
 public class CoordinateConverter {
@@ -23,8 +22,8 @@ public class CoordinateConverter {
 
 
     // You may interpret this as a chunk position (or as the position of a 2x2 chunk "pair"/ something larger, whatever fits your size)
-    public Vector<Long> convertToPosition(long id) {
-        Vector<Long> out = id > 8 ? convertToPosition(id / 9) : new Vector<>(Arrays.asList(0L,0L));
+    public Vector<Long> convertToGridPosition(long id) {
+        Vector<Long> out = id > 8 ? convertToGridPosition(id / 9) : new Vector<>(Arrays.asList(0L,0L));
         long x = out.get(0) * 3;
         long z = out.get(1) * 3;
 
@@ -37,7 +36,7 @@ public class CoordinateConverter {
         return out;
     }
 
-    public long convertToID(Vector<Long> vector) {
+    public long convertGridPositionToID(Vector<Long> vector) {
         return convToID(new Vector<>(vector));
     }
 
@@ -57,16 +56,20 @@ public class CoordinateConverter {
         return id;
     }
 
-    public long findIDToFit(long size){
+    public long findIDToFitGridSize(long size){
         if (size < 1) {
             throw new RuntimeException("size cannot be lower than 1");
         }
+
+        // find smallest 3^n >= size
         long n = 1;
         while (size > n) {
             n *= 3;
         }
-        n *= n;
-        return cursor - (cursor % n) + n - 1;
+        n *= n; // n^2
+        // take highest number n*m <= cursor (basically first id that a room of size "size" would occupy if it were placed one size x size block before)
+        // then add 2*n - 1 to get the last id our actual room we are trying to find a spot for would occupy
+        return cursor - (Math.floorMod(cursor - 1, n) + 1) + 2*n -1;
     }
 
     public void claimID(long id) {
