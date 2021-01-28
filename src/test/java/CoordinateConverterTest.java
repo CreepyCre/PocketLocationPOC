@@ -33,45 +33,22 @@ class CoordinateConverterTest {
     }
 
     @Test
-    void findIDtoFitTest() {
+    void findNextIDAndClaimTest() {
         CoordinateConverter cc = new CoordinateConverter();
-        assertEquals(0, cc.findIDToFitGridSize(1));
-        assertEquals(8, cc.findIDToFitGridSize(2));
-        assertEquals(8, cc.findIDToFitGridSize(3));
-        assertEquals(80, cc.findIDToFitGridSize(4));
-        assertEquals(80, cc.findIDToFitGridSize(5));
-        assertEquals(80, cc.findIDToFitGridSize(6));
-        assertEquals(80, cc.findIDToFitGridSize(7));
-        assertEquals(80, cc.findIDToFitGridSize(8));
-        assertEquals(80, cc.findIDToFitGridSize(9));
-        assertEquals(728, cc.findIDToFitGridSize(10));
-        assertEquals(728, cc.findIDToFitGridSize(27));
-    }
+        assertEquals(0, cc.findNextIDAndClaim(1));
+        assertEquals(1, cc.findNextIDAndClaim(1));
+        assertEquals(2, cc.findNextIDAndClaim(1));
+        assertEquals(3, cc.findNextIDAndClaim(1));
+        assertEquals(4, cc.findNextIDAndClaim(1));
+        assertEquals(5, cc.findNextIDAndClaim(1));
+        assertEquals(6, cc.findNextIDAndClaim(1));
 
-    @Test
-    void claimIDTest() {
-        CoordinateConverter cc = new CoordinateConverter();
-        assertEquals(0, cc.findIDToFitGridSize(1));
-        cc.claimID(0);
-        assertEquals(1, cc.findIDToFitGridSize(1));
-        cc.claimID(1);
-        assertEquals(2, cc.findIDToFitGridSize(1));
-        cc.claimID(2);
-        assertEquals(3, cc.findIDToFitGridSize(1));
-        cc.claimID(3);
-        assertEquals(4, cc.findIDToFitGridSize(1));
-        cc.claimID(4);
-        assertEquals(5, cc.findIDToFitGridSize(1));
-        cc.claimID(5);
-        assertEquals(6, cc.findIDToFitGridSize(1));
-        cc.claimID(6);
+        assertEquals(9, cc.findNextIDAndClaim(3));
+        assertEquals(18, cc.findNextIDAndClaim(3));
+        assertEquals(81, cc.findNextIDAndClaim(4));
 
-
-        assertEquals(17, cc.findIDToFitGridSize(3));
-        cc.claimID(17);
-        assertEquals(26, cc.findIDToFitGridSize(3));
-        cc.claimID(27);
-        assertEquals(44, cc.findIDToFitGridSize(3));
-
+        assertEquals(27, cc.findNextIDAndClaim(3));
+        assertEquals(7, cc.findNextIDAndClaim(1));
+        assertEquals(8, cc.findNextIDAndClaim(1));
     }
 }

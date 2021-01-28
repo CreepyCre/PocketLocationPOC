@@ -1,10 +1,10 @@
-import java.util.Arrays;
-import java.util.Vector;
+import java.util.*;
 
 public class CoordinateConverter {
 
-    // all ids >= cursor are unused
-    private long cursor = 0;
+    // key -> size
+    // value -> id cursor of that size
+    private final SortedMap<Long, Long> cursorMap = new TreeMap<>();
 
     /*
     0 ->  0, 0
@@ -17,7 +17,7 @@ public class CoordinateConverter {
     7 ->  1,-1
     8 -> -1,-1
 
-    If last id in area is lowest position, then we can use the last id as a pockets assigned position. This makes claiming IDs easier.
+    If last id in area is lowest position, then we can use the last id as a pockets assigned position.
      */
 
 
@@ -56,25 +56,28 @@ public class CoordinateConverter {
         return id;
     }
 
-    public long findIDToFitGridSize(long size){
+    public long findNextIDAndClaim(long size){
         if (size < 1) {
             throw new RuntimeException("size cannot be lower than 1");
         }
-
-        // find smallest 3^n >= size
+        // find smallest 3^l >= size
         long n = 1;
         while (size > n) {
             n *= 3;
         }
-        n *= n; // n^2
-        // take highest number n*m <= cursor (basically first id that a room of size "size" would occupy if it were placed one size x size block before)
-        // then add 2*n - 1 to get the last id our actual room we are trying to find a spot for would occupy
-        return cursor - (Math.floorMod(cursor - 1, n) + 1) + 2*n -1;
-    }
 
-    public void claimID(long id) {
-        if (id >= cursor) {
-            cursor = id + 1;
+        long m = n * n; // n^2
+
+        long cursor = cursorMap.headMap(n+1).values().stream().mapToLong(num -> num).max().orElse(-1L);
+        cursor = cursor - (Math.floorMod(cursor, m)) + m; // lowest id in the next area of size "size"
+        while (true) {
+            long finalCursor = cursor;
+            OptionalLong largestSizeAtID = cursorMap.tailMap(n+1).entrySet().stream().filter(entry -> entry.getValue().equals(finalCursor)).mapToLong(Map.Entry::getKey).max();
+            if (!largestSizeAtID.isPresent()) break;
+            cursor += largestSizeAtID.getAsLong() * largestSizeAtID.getAsLong();
         }
+
+        cursorMap.put(n, cursor);
+        return cursor;
     }
 }
